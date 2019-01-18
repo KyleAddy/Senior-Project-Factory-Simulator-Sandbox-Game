@@ -15,7 +15,6 @@ public class robot : MonoBehaviour {
 	float degreesPerSecond;
 	public bool inAction = false;
 	public bool isRunning = false;
-	public GameObject progMenu;
 	public GameObject robotCanvas;
 	GameObject selectedInv;
 	public Image progBar;
@@ -180,11 +179,6 @@ public class robot : MonoBehaviour {
             }
         }
     }
-
-	void OnMouseDown(){
-		gameGlobal.GLOBAL_selectedObject = GetComponent<LocationInitiation>().objectID;
-		progMenu.SetActive (true);
-	}
 
 	void nextAction(){
 		action = "none";

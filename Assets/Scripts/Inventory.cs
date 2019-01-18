@@ -11,7 +11,7 @@ public class Inventory : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        for (int i = 0; i < inventory.Length; i++)
-            inventory[i] = null;
+      //  for (int i = 0; i < inventory.Length; i++)
+        //    inventory[i] = null;
     }
 }
