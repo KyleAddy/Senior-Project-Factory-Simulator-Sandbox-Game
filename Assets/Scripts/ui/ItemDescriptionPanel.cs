@@ -10,6 +10,7 @@ public class ItemDescriptionPanel : MonoBehaviour
     [SerializeField] GameObject textField;
     [SerializeField] GameObject image;
     [SerializeField] GameObject globalGameObj;
+    
     public bool isPlayerInv;
 
     // Use this for initialization

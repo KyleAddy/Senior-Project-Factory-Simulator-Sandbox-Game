@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class SelectedInventoryPanel : MonoBehaviour
 {
     [SerializeField] GameObject itemDescriptionPanel;
+    [SerializeField] GameObject globalGameObj;
 
     // Use this for initialization
     void Start()
@@ -37,7 +38,7 @@ public class SelectedInventoryPanel : MonoBehaviour
 
     public void itemDescription(int itemIndex)
     {
-        if (gameGlobal.GLOBAL_selectedObject.GetComponent<Inventory>().inventory[itemIndex] != null)
+        if (gameGlobal.GLOBAL_selectedObject.GetComponent<Inventory>().inventory[itemIndex] != null && Input.GetKey(KeyCode.LeftShift))
         {
             itemDescriptionPanel.SetActive(true);
             itemDescriptionPanel.GetComponent<ItemDescriptionPanel>().isPlayerInv = false;
@@ -45,6 +46,25 @@ public class SelectedInventoryPanel : MonoBehaviour
         else
             itemDescriptionPanel.SetActive(false);
         itemDescriptionPanel.GetComponent<ItemDescriptionPanel>().itemIndex = itemIndex;
+    }
+
+    public void transferItem(int itemSlot)
+    {
+        if (gameGlobal.GLOBAL_selectedObject.GetComponent<Inventory>().inventory[itemSlot] != null)
+        {
+            int emptySlot = -1;
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                emptySlot = globalGameObj.GetComponent<gameGlobal>().findEmptArraySlot(globalGameObj.GetComponent<Inventory>().inventory, globalGameObj.GetComponent<Inventory>().invSize);
+                if (emptySlot != -1)
+                {
+                    globalGameObj.GetComponent<Inventory>().inventory[emptySlot] = gameGlobal.GLOBAL_selectedObject.GetComponent<Inventory>().inventory[itemSlot];
+                    gameGlobal.GLOBAL_selectedObject.GetComponent<Inventory>().inventory[itemSlot] = null;
+                }
+
+            }
+        }
     }
 
 }

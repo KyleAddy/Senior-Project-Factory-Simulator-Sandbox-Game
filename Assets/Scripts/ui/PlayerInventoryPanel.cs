@@ -14,18 +14,8 @@ public class PlayerInventoryPanel : MonoBehaviour
         updateinventory();
     }
 
-    void activateAllSlot()
-    {
-
-        foreach (Transform child in transform)
-        {
-            child.gameObject.SetActive(true);
-        }
-    }
-
     public void updateinventory()
     {
-        //activateAllSlot();
         foreach (Transform child in transform)
         {            
             if (child.gameObject.CompareTag("invSlot"))
@@ -38,7 +28,7 @@ public class PlayerInventoryPanel : MonoBehaviour
 
     public void itemDescription(int itemIndex)
     {
-        if (globalGameObj.GetComponent<Inventory>().inventory[itemIndex] != null)
+        if (globalGameObj.GetComponent<Inventory>().inventory[itemIndex] != null && !Input.GetKey(KeyCode.LeftShift))
         {
             itemDescriptionPanel.SetActive(true);
             itemDescriptionPanel.GetComponent<ItemDescriptionPanel>().isPlayerInv = true;
@@ -46,5 +36,26 @@ public class PlayerInventoryPanel : MonoBehaviour
         else
             itemDescriptionPanel.SetActive(false);
         itemDescriptionPanel.GetComponent<ItemDescriptionPanel>().itemIndex = itemIndex;
+    }
+
+    public void transferItem(int itemSlot)
+    {
+        if (globalGameObj.GetComponent<Inventory>().inventory[itemSlot] != null)
+        {
+            int emptySlot = -1;
+            if (gameGlobal.GLOBAL_selectedObject != null)
+            {
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    emptySlot = globalGameObj.GetComponent<gameGlobal>().findEmptArraySlot(gameGlobal.GLOBAL_selectedObject.GetComponent<Inventory>().inventory, gameGlobal.GLOBAL_selectedObject.GetComponent<Inventory>().invSize);
+                    if (emptySlot != -1)
+                    {
+                        gameGlobal.GLOBAL_selectedObject.GetComponent<Inventory>().inventory[emptySlot] = globalGameObj.GetComponent<Inventory>().inventory[itemSlot];
+                        globalGameObj.GetComponent<Inventory>().inventory[itemSlot] = null;
+                    }
+                        
+                }
+            }
+        }
     }
 }

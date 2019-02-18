@@ -13,6 +13,7 @@ public class progSlot : MonoBehaviour {
 	public Sprite repeat;
 	public Sprite deposit;
 	public Sprite withdraw;
+    public Sprite mine;
 
 	public Image m_Image;
 	public GameObject menu;
@@ -57,7 +58,12 @@ public class progSlot : MonoBehaviour {
 		case "withdraw":
 			m_Image.sprite = withdraw;
 			break;
-		}
+
+        case "mine":
+            m_Image.sprite = mine;
+            break;
+
+            }
 
 
 		if(gameGlobal.GLOBAL_selectedIndex == index)

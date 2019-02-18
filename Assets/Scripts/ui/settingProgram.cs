@@ -9,7 +9,14 @@ public class settingProgram : MonoBehaviour {
 	}
 		
 	public void setAction(){
-		gameGlobal.GLOBAL_selectedObject.GetComponent<robot>().progArray [gameGlobal.GLOBAL_selectedIndex] = buttonType;
-		gameGlobal.GLOBAL_selectedIndex++;
+        if (buttonType == "clearBlock") {
+            gameGlobal.GLOBAL_selectedObject.GetComponent<robot>().progArray[gameGlobal.GLOBAL_selectedIndex] = "none";
+        }
+        else
+        {
+            gameGlobal.GLOBAL_selectedObject.GetComponent<robot>().progArray[gameGlobal.GLOBAL_selectedIndex] = buttonType;
+            if (gameGlobal.GLOBAL_selectedObject.GetComponent<robot>().progArray[gameGlobal.GLOBAL_selectedIndex] != "withdraw" && gameGlobal.GLOBAL_selectedObject.GetComponent<robot>().progArray[gameGlobal.GLOBAL_selectedIndex] != "deposit")
+                gameGlobal.GLOBAL_selectedIndex++;
+        }
 	}
 }

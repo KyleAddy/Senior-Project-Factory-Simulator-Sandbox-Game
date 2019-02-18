@@ -19,4 +19,16 @@ public class gameGlobal : MonoBehaviour {
 		GLOBAL_worldX = 10;
 		GLOBAL_worldZ = 10;
 	}
+
+    public int findEmptArraySlot(ItemSO[] array, int arraySize)
+    {
+        for (int i = 0; i < arraySize; i++)
+        {
+            if (array[i] == null)
+            {
+                return (i);
+            }
+        }
+        return (-1);
+    }
 }

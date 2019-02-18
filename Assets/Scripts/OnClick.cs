@@ -7,10 +7,18 @@ public class OnClick : MonoBehaviour
 
     [SerializeField] GameObject gameGlobalObj;
 
+    private void Start()
+    {
+        gameGlobalObj = GameObject.Find("gameGlobal");
+    }
+
     void OnMouseDown()
     {
-        gameGlobal.GLOBAL_selectedObject = GetComponent<LocationInitiation>().objectID;
-        ObjType();
+        if (gameGlobalObj.GetComponent<ui>().currentMenu == "")
+        {
+            gameGlobal.GLOBAL_selectedObject = GetComponent<LocationInitiation>().objectID;
+            ObjType();
+        }
     }
 
     void ObjType()
@@ -22,6 +30,14 @@ public class OnClick : MonoBehaviour
         else if (gameObject.CompareTag("storage"))
         {
             gameGlobalObj.GetComponent<ui>().EnableInvMenu();
+        }
+        else if (gameObject.CompareTag("refinery"))
+        {
+            gameGlobalObj.GetComponent<ui>().EnableRefineryMenu();
+        }
+        else if (gameObject.CompareTag("assembler"))
+        {
+            gameGlobalObj.GetComponent<ui>().EnableAssemblerMenu();
         }
     }
 }
