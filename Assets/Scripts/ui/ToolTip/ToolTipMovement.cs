@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class ToolTipMovement : MonoBehaviour
 {
     
-    public float offset = 150;
+    [SerializeField]float offset;
 
     // Start is called before the first frame update
     void Start()
@@ -17,19 +17,33 @@ public class ToolTipMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //SetPosition();
+        SetPosition();
 
         if (Input.GetKeyDown(KeyCode.N)){
 
-            //Debug.Log("mouse: "+ Input.mousePosition);
+            Debug.Log("mouse X: "+ Input.mousePosition.x);
+            Debug.Log("mouse Y: "+ Input.mousePosition.y);
+            //Debug.Log("mouse Z: "+ Input.mousePosition.z);
             //Debug.Log("panel: "+transform.position);
         }
     }
 
     public void SetPosition(){
-        //transform.position = Input.mousePosition + offset;
-
-        //Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //transform.position = new Vector2(worldMousePos.x, worldMousePos.y);
+        offset = Screen.width/8;
+        Vector3 toolTipPos;
+        toolTipPos = Input.mousePosition;
+        if (Input.mousePosition.x > Screen.width-(Screen.width/5)){
+            toolTipPos.x -= offset;
+        }else {
+            toolTipPos.x += offset;
+        }
+        if (Input.mousePosition.y > (Screen.height/4)){
+            toolTipPos.y -= offset;
+        }else {
+            toolTipPos.y += offset;
+        }
+        
+        
+        transform.position = toolTipPos;
     }
 }
