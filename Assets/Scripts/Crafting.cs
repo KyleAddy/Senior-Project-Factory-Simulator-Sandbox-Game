@@ -137,6 +137,13 @@ public class Crafting : MonoBehaviour
     {
         isCrafting = true;
         progNumber = 0;
+
+        if (gameObject.CompareTag("assembler")){
+            GetComponent<AssemblerAnimation>().isAnimation = true;
+        }
+        else if (gameObject.CompareTag("assembler")){
+            //GetComponent<RefineryAnimation>().isAnimation = true;
+        }
     }
 
     void UpdateProgNumber()
@@ -147,6 +154,13 @@ public class Crafting : MonoBehaviour
                 progNumber += progressSpeed * Time.deltaTime;
             else
             {
+                if (gameObject.CompareTag("assembler")){
+                    GetComponent<AssemblerAnimation>().isAnimation = false;
+                }
+                else if (gameObject.CompareTag("assembler")){
+                    //GetComponent<RefineryAnimation>().isAnimation = false;
+                }
+
                 progNumber = 0;
                 isCrafting = false;
                 CraftItem();

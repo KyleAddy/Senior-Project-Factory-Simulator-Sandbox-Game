@@ -66,6 +66,7 @@
      <Compile Include="Assets\ProCore\ProGrids\Classes\pg_SceneMeshRender.cs" />
      <Compile Include="Assets\ProCore\ProGrids\Classes\pg_Util.cs" />
      <Compile Include="Assets\ProCore\ProGrids\MonoBehaviour\pg_IgnoreSnap.cs" />
+     <Compile Include="Assets\Scripts\AssemblerAnimation.cs" />
      <Compile Include="Assets\Scripts\Crafting.cs" />
      <Compile Include="Assets\Scripts\gameGlobal.cs" />
      <Compile Include="Assets\Scripts\Inventory.cs" />
@@ -73,6 +74,7 @@
      <Compile Include="Assets\Scripts\OnClick.cs" />
      <Compile Include="Assets\Scripts\OreMine.cs" />
      <Compile Include="Assets\Scripts\Player Scrits\blueprint.cs" />
+     <Compile Include="Assets\Scripts\Player Scrits\CameraMovement.cs" />
      <Compile Include="Assets\Scripts\Player Scrits\PlacingItemInWorld.cs" />
      <Compile Include="Assets\Scripts\Player Scrits\playerCrafting.cs" />
      <Compile Include="Assets\Scripts\Player Scrits\PlayerMovement.cs" />
@@ -394,6 +396,21 @@
  <Reference Include="UnityEngine.SpatialTracking">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.0f2/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
  </Reference>
+ <Reference Include="ProBuilderCore-Unity5">
+ <HintPath>C:/Users/kyle addy/Documents/GitHub/Senior Project/Assets/ProCore/ProBuilder/Classes/ProBuilderCore-Unity5.dll</HintPath>
+ </Reference>
+ <Reference Include="ProBuilderMeshOps-Unity5">
+ <HintPath>C:/Users/kyle addy/Documents/GitHub/Senior Project/Assets/ProCore/ProBuilder/Classes/ProBuilderMeshOps-Unity5.dll</HintPath>
+ </Reference>
+ <Reference Include="KdTreeLib">
+ <HintPath>C:/Users/kyle addy/Documents/GitHub/Senior Project/Assets/ProCore/ProBuilder/Classes/ClassesLib/KdTreeLib.dll</HintPath>
+ </Reference>
+ <Reference Include="pb_Stl">
+ <HintPath>C:/Users/kyle addy/Documents/GitHub/Senior Project/Assets/ProCore/ProBuilder/Classes/ClassesLib/pb_Stl.dll</HintPath>
+ </Reference>
+ <Reference Include="Poly2Tri">
+ <HintPath>C:/Users/kyle addy/Documents/GitHub/Senior Project/Assets/ProCore/ProBuilder/Classes/ClassesLib/Poly2Tri.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.Advertisements">
  <HintPath>C:/Users/kyle addy/Documents/GitHub/Senior Project/Library/PackageCache/com.unity.ads@2.3.1/Runtime/UnityEngine.Advertisements.dll</HintPath>
  </Reference>
@@ -408,21 +425,6 @@
  </Reference>
  <Reference Include="Unity.Analytics.Tracker">
  <HintPath>C:/Users/kyle addy/Documents/GitHub/Senior Project/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Tracker.dll</HintPath>
- </Reference>
- <Reference Include="Poly2Tri">
- <HintPath>C:/Users/kyle addy/Documents/GitHub/Senior Project/Assets/ProCore/ProBuilder/Classes/ClassesLib/Poly2Tri.dll</HintPath>
- </Reference>
- <Reference Include="KdTreeLib">
- <HintPath>C:/Users/kyle addy/Documents/GitHub/Senior Project/Assets/ProCore/ProBuilder/Classes/ClassesLib/KdTreeLib.dll</HintPath>
- </Reference>
- <Reference Include="pb_Stl">
- <HintPath>C:/Users/kyle addy/Documents/GitHub/Senior Project/Assets/ProCore/ProBuilder/Classes/ClassesLib/pb_Stl.dll</HintPath>
- </Reference>
- <Reference Include="ProBuilderCore-Unity5">
- <HintPath>C:/Users/kyle addy/Documents/GitHub/Senior Project/Assets/ProCore/ProBuilder/Classes/ProBuilderCore-Unity5.dll</HintPath>
- </Reference>
- <Reference Include="ProBuilderMeshOps-Unity5">
- <HintPath>C:/Users/kyle addy/Documents/GitHub/Senior Project/Assets/ProCore/ProBuilder/Classes/ProBuilderMeshOps-Unity5.dll</HintPath>
  </Reference>
  <Reference Include="netstandard">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.0f2/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>
