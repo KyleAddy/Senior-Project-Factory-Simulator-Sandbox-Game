@@ -17,10 +17,14 @@ public class blueprint : MonoBehaviour
     GameObject gameGlobalObj;
     GameObject player;
 
+    int numOfChildren;
+
     private void Start()
     {
         gameGlobalObj = GameObject.Find("gameGlobal");
-        player = GameObject.Find("gameGlobal");
+        player = GameObject.Find("player");
+        int numOfChildren = transform.childCount;
+        numOfChildren--;
     }
 
     // Update is called once per frame
@@ -28,6 +32,7 @@ public class blueprint : MonoBehaviour
     {
         moveToMouse();
         createObject();
+        cancelPlacement();
         //TestDistToPlayer();
     }
 
@@ -56,14 +61,30 @@ public class blueprint : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        GetComponent<MeshRenderer>().material = red;
-        freeSpace = false;
+        if (!other.CompareTag("trigger")){
+            if(GetComponent<MeshRenderer>() != null)
+                GetComponent<MeshRenderer>().material = red;
+            for(int i = 0; i <= (transform.childCount-1); i++)
+            {
+                GameObject child = transform.GetChild(i).gameObject;
+                child.GetComponent<MeshRenderer>().sharedMaterial = red;
+            }
+            freeSpace = false;
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        GetComponent<MeshRenderer>().material = blue;
-        freeSpace = true;
+        if (!other.CompareTag("trigger")){
+            if(GetComponent<MeshRenderer>() != null)
+                GetComponent<MeshRenderer>().material = blue;
+            for(int i = 0; i <= (transform.childCount-1); i++)
+            {
+                GameObject child = transform.GetChild(i).gameObject;
+                child.GetComponent<MeshRenderer>().sharedMaterial = blue;
+            }
+            freeSpace = true;
+        }
     }
 
     void TestDistToPlayer()
@@ -78,6 +99,12 @@ public class blueprint : MonoBehaviour
         {
             GetComponent<MeshRenderer>().material = red;
             isCloseToPlayer = false;
+        }
+    }
+
+    void cancelPlacement(){
+        if(Input.GetKeyDown(KeyCode.Escape)){
+            Destroy(gameObject);
         }
     }
 }

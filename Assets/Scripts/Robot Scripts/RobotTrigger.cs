@@ -8,11 +8,13 @@ public class RobotTrigger : MonoBehaviour
     [SerializeField] string direction = "";
 
     void OnTriggerEnter(Collider other)
-    {
-        if (direction == "forward")
-            robot.GetComponent<robot>().forwardTrigger = true;
-        else
-            robot.GetComponent<robot>().backwardTrigger = true;
+    {   
+        if (other.CompareTag("blueprint")){
+            if (direction == "forward")
+                robot.GetComponent<robot>().forwardTrigger = true;
+            else
+                robot.GetComponent<robot>().backwardTrigger = true;
+        }
     }
 
     private void OnTriggerExit(Collider other)

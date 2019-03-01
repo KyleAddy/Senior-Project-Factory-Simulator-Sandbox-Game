@@ -16,6 +16,7 @@ public class ItemSO : ScriptableObject {
     public Sprite itemSprite;
     public string itemDescription;
     public GameObject itemPrefab;
+    public GameObject itemBlueprint;
 
     public recipe[] craftingRecipe;
     public int numOfDifItems;

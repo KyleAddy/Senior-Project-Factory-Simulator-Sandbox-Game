@@ -21,7 +21,11 @@ public class PlacingItemInWorld : MonoBehaviour
                     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     mousePos.y = .5f;
                     var objectPos = Camera.main.ScreenToWorldPoint(mousePos);
-                    createdObject = Instantiate(blueprint, objectPos, Quaternion.identity);
+                    if(GetComponent<Inventory>().inventory[invIndex].itemBlueprint != null){
+                        createdObject = Instantiate(GetComponent<Inventory>().inventory[invIndex].itemBlueprint, objectPos, Quaternion.identity);
+                    }else{
+                        createdObject = Instantiate(blueprint, objectPos, Quaternion.identity);
+                    }
                     createdObject.GetComponent<blueprint>().prefabToPlace = GetComponent<Inventory>().inventory[invIndex].itemPrefab;
                     createdObject.GetComponent<blueprint>().invIndex = invIndex;
                     isCreated = true;
