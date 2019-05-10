@@ -141,8 +141,8 @@ public class Crafting : MonoBehaviour
         if (gameObject.CompareTag("assembler")){
             GetComponent<AssemblerAnimation>().isAnimation = true;
         }
-        else if (gameObject.CompareTag("assembler")){
-            //GetComponent<RefineryAnimation>().isAnimation = true;
+        else if (gameObject.CompareTag("refinery")){
+            GetComponent<RefineryAnimation>().isAnimation = true;
         }
     }
 
@@ -157,8 +157,8 @@ public class Crafting : MonoBehaviour
                 if (gameObject.CompareTag("assembler")){
                     GetComponent<AssemblerAnimation>().isAnimation = false;
                 }
-                else if (gameObject.CompareTag("assembler")){
-                    //GetComponent<RefineryAnimation>().isAnimation = false;
+                else if (gameObject.CompareTag("refinery")){
+                    GetComponent<RefineryAnimation>().isAnimation = false;
                 }
 
                 progNumber = 0;

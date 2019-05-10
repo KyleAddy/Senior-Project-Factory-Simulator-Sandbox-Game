@@ -9,6 +9,7 @@ public class CommandWindow : MonoBehaviour
     [SerializeField] GameObject refineryButton;
     [SerializeField] GameObject assemblerButton;
     [SerializeField] GameObject invButton;
+    [SerializeField] GameObject pickUpButton;
 
     [SerializeField] GameObject invMenu;
 
@@ -18,18 +19,19 @@ public class CommandWindow : MonoBehaviour
         SetButton();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     public void SetButton()
     {
+        disableButtons();
         gameObject.SetActive(true);
+        invMenu.SetActive(true);
+        //pickUpButton.SetActive(false);
+        //invButton.SetActive(false);
+
         if (gameGlobal.GLOBAL_selectedObject != null)
         {
             disableButtons();
+            pickUpButton.SetActive(true);
             switch (globalGameObj.GetComponent<ui>().currentMenu)
             {
                 case "inventory":
@@ -57,6 +59,7 @@ public class CommandWindow : MonoBehaviour
     void InvScreenButtons()
     {
         disableButtons();
+        pickUpButton.SetActive(true);
         invMenu.SetActive(true);
         switch (gameGlobal.GLOBAL_selectedObject.tag)
         {
@@ -69,17 +72,19 @@ public class CommandWindow : MonoBehaviour
                 break;
 
             case "assembler":
-               assemblerButton.SetActive(true);
+                assemblerButton.SetActive(true);
                 break;
         }
     }
 
     void disableButtons()
     {
+        //print("buttons disabled");
         invButton.SetActive(false);
         progButton.SetActive(false);
         refineryButton.SetActive(false);
         assemblerButton.SetActive(false);
         invMenu.SetActive(false);
+        pickUpButton.SetActive(false);
     }
 }
