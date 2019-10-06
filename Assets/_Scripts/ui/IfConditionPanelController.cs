@@ -30,25 +30,53 @@ public class IfConditionPanelController : MonoBehaviour
     {
         if (GlobalVariables.GLOBAL_selectedObject != null)
         {
-            if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().progArray[GlobalVariables.GLOBAL_selectedIndex] == "if" && !IfConditionPanel.activeSelf)
+            if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
             {
-                IfConditionPanel.SetActive(true);
-                if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().toggleIfConditionOutput[GlobalVariables.GLOBAL_selectedIndex]){
-                    ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "!";
-                }
-                else
+                if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].action == "if" && !IfConditionPanel.activeSelf)
                 {
-                    ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "";
+                    IfConditionPanel.SetActive(true);
+                    if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].toggleIfConditionOuput)
+                    {
+                        ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "!";
+                    }
+                    else
+                    {
+                        ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "";
+                    }
+                    if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCondition == "" || GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCondition == null)
+                    {
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "";
+                    }
                 }
-                if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCondition[GlobalVariables.GLOBAL_selectedIndex] == "" || GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCondition[GlobalVariables.GLOBAL_selectedIndex] == null)
+                else if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].action != "if" && IfConditionPanel.activeSelf)
                 {
-                    IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "";
-                }                    
+                    IfConditionPanel.SetActive(false);
+                }
             }
-            else if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().progArray[GlobalVariables.GLOBAL_selectedIndex] != "if" && IfConditionPanel.activeSelf)
+            else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
             {
-                IfConditionPanel.SetActive(false);
+                if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].action == "if" && !IfConditionPanel.activeSelf)
+                {
+                    IfConditionPanel.SetActive(true);
+                    if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].toggleIfConditionOuput)
+                    {
+                        ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "!";
+                    }
+                    else
+                    {
+                        ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "";
+                    }
+                    if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCondition == "" || RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCondition == null)
+                    {
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "";
+                    }
+                }
+                else if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].action != "if" && IfConditionPanel.activeSelf)
+                {
+                    IfConditionPanel.SetActive(false);
+                }
             }
+
         }
         else if (IfConditionPanel.activeSelf)
         {
@@ -58,7 +86,14 @@ public class IfConditionPanelController : MonoBehaviour
 
     public void SetIfCondition(string condition)
     {
-        GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCondition[GlobalVariables.GLOBAL_selectedIndex] = condition;
+        if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
+        {
+            GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCondition = condition;
+        }
+        else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
+        {
+            RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCondition = condition;
+        }
     }    
 
     public void SetIfConditionDisplay(GameObject text)
@@ -70,65 +105,139 @@ public class IfConditionPanelController : MonoBehaviour
     {
         if(GlobalVariables.GLOBAL_selectedObject != null)
         {
-            GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().toggleIfConditionOutput[GlobalVariables.GLOBAL_selectedIndex] = !GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().toggleIfConditionOutput[GlobalVariables.GLOBAL_selectedIndex];
-            if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().toggleIfConditionOutput[GlobalVariables.GLOBAL_selectedIndex])
+            if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
             {
-                ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "!";
+                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].toggleIfConditionOuput = !GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].toggleIfConditionOuput;
+                if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].toggleIfConditionOuput)
+                {
+                    ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "!";
+                }
+                else
+                {
+                    ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "";
+                }
             }
-            else
+            else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
             {
-                ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "";
+                RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].toggleIfConditionOuput = !RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].toggleIfConditionOuput;
+                if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].toggleIfConditionOuput)
+                {
+                    ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "!";
+                }
+                else
+                {
+                    ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "";
+                }
             }
+
         }
     }
 
     public void UpdateIfConditionDisplayPanel()
     {
-            if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().toggleIfConditionOutput[GlobalVariables.GLOBAL_selectedIndex])
+        if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
+        {
+            if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].toggleIfConditionOuput)
             {
                 ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "!";
             }
             else
             {
                 ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "";
-            }        
-
-        ifCountAmountPanel.SetActive(false);//disable the If count panel
-        if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCondition[GlobalVariables.GLOBAL_selectedIndex] == "" || GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCondition[GlobalVariables.GLOBAL_selectedIndex] == null)
-        {
-            IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "";
-        }
-        else
-        {
-            switch (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCondition[GlobalVariables.GLOBAL_selectedIndex])
-            {
-                case "invFull":
-                    IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Robot Inventory Full";
-                    break;
-
-                case "invEmpty":
-                    IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Robot Inventory Empty";
-                    break;
-
-                case "AdjacentInvFull":
-                    IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Adjacent Inventory Full";
-                    break;
-
-                case "AdjacentInvEmpty":
-                    IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Adjacent Inventory Empty";
-                    break;
-
-                case "RobotXEmptySlots":
-                    IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = " Robot has X Amount of Empty Slots";
-                    ifCountAmountPanel.SetActive(true);
-                    break;
-
-                case "AdjacentInvXEmptySlots":
-                    IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Adjacent Inventory has X Amount of Empty Inventory Slots";
-                    ifCountAmountPanel.SetActive(true);
-                    break;
             }
         }
+        else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
+        {
+            if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].toggleIfConditionOuput)
+            {
+                ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "!";
+            }
+            else
+            {
+                ifConditionToggleButton.GetComponent<TextMeshProUGUI>().text = "";
+            }
+        }
+
+
+        ifCountAmountPanel.SetActive(false);//disable the If count panel
+
+        if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
+        {
+            if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCondition == "" || GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCondition == null)
+            {
+                IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "";
+            }
+            else
+            {
+                switch (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCondition)
+                {
+                    case "invFull":
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Robot Inventory Full";
+                        break;
+
+                    case "invEmpty":
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Robot Inventory Empty";
+                        break;
+
+                    case "AdjacentInvFull":
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Adjacent Inventory Full";
+                        break;
+
+                    case "AdjacentInvEmpty":
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Adjacent Inventory Empty";
+                        break;
+
+                    case "RobotXEmptySlots":
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = " Robot has X Amount of Empty Slots";
+                        ifCountAmountPanel.SetActive(true);
+                        break;
+
+                    case "AdjacentInvXEmptySlots":
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Adjacent Inventory has X Amount of Empty Inventory Slots";
+                        ifCountAmountPanel.SetActive(true);
+                        break;
+                }
+            }
+        }
+        else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
+        {
+            if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCondition == "" || RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCondition == null)
+            {
+                IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "";
+            }
+            else
+            {
+                switch (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCondition)
+                {
+                    case "invFull":
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Robot Inventory Full";
+                        break;
+
+                    case "invEmpty":
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Robot Inventory Empty";
+                        break;
+
+                    case "AdjacentInvFull":
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Adjacent Inventory Full";
+                        break;
+
+                    case "AdjacentInvEmpty":
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Adjacent Inventory Empty";
+                        break;
+
+                    case "RobotXEmptySlots":
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = " Robot has X Amount of Empty Slots";
+                        ifCountAmountPanel.SetActive(true);
+                        break;
+
+                    case "AdjacentInvXEmptySlots":
+                        IFConditionDisplayText.GetComponent<TextMeshProUGUI>().text = "Adjacent Inventory has X Amount of Empty Inventory Slots";
+                        ifCountAmountPanel.SetActive(true);
+                        break;
+                }
+            }
+        }
+
 
 
         UpdateifCountAmountDisplay();
@@ -138,33 +247,70 @@ public class IfConditionPanelController : MonoBehaviour
     {
         if (GlobalVariables.GLOBAL_selectedObject != null)
         {
-            if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCountAmount[GlobalVariables.GLOBAL_selectedIndex] <= 20  && Input.GetKey(KeyCode.LeftShift))
+            if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
             {
-                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCountAmount[GlobalVariables.GLOBAL_selectedIndex] += 5;
+                if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCountAmount <= 20 && Input.GetKey(KeyCode.LeftShift))
+                {
+                    GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCountAmount += 5;
+                }
+                else if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCountAmount <= 24)
+                {
+                    GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCountAmount++;
+                }
             }
-            else if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCountAmount[GlobalVariables.GLOBAL_selectedIndex] <= 24)
+            else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
             {
-                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCountAmount[GlobalVariables.GLOBAL_selectedIndex]++;
+                if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCountAmount <= 20 && Input.GetKey(KeyCode.LeftShift))
+                {
+                    RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCountAmount += 5;
+                }
+                else if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCountAmount <= 24)
+                {
+                    RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCountAmount++;
+                }
             }
+
             UpdateifCountAmountDisplay();
         }
     }
 
     public void DecIfCountAmount()
     {
-        if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCountAmount[GlobalVariables.GLOBAL_selectedIndex] >= 5 && Input.GetKey(KeyCode.LeftShift))
+        if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
         {
-            GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCountAmount[GlobalVariables.GLOBAL_selectedIndex] -= 5;
+            if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCountAmount >= 5 && Input.GetKey(KeyCode.LeftShift))
+            {
+                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCountAmount -= 5;
+            }
+            else if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCountAmount > 0)
+            {
+                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCountAmount--;
+            }
         }
-        else if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCountAmount[GlobalVariables.GLOBAL_selectedIndex] > 0)
+        else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
         {
-            GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCountAmount[GlobalVariables.GLOBAL_selectedIndex]--;
+            if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCountAmount >= 5 && Input.GetKey(KeyCode.LeftShift))
+            {
+                RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCountAmount -= 5;
+            }
+            else if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCountAmount > 0)
+            {
+                RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCountAmount--;
+            }
         }
+
         UpdateifCountAmountDisplay();
     }
 
     public void UpdateifCountAmountDisplay()
     {
-        ifCountAmountTextDisplay.GetComponent<TextMeshProUGUI>().text = GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().ifCountAmount[GlobalVariables.GLOBAL_selectedIndex].ToString();
+        if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
+        {
+            ifCountAmountTextDisplay.GetComponent<TextMeshProUGUI>().text = GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].ifCountAmount.ToString();
+        }
+        else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
+        {
+            ifCountAmountTextDisplay.GetComponent<TextMeshProUGUI>().text = RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].ifCountAmount.ToString();
+        }
     }
 }

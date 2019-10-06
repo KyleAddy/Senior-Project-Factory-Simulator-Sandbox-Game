@@ -25,15 +25,31 @@ public class ForLoopPanelController : MonoBehaviour
     {
         if (GlobalVariables.GLOBAL_selectedObject != null)
         {
-            if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().progArray[GlobalVariables.GLOBAL_selectedIndex] == "for")
+            if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
             {
-                ForLoopPanel.SetActive(true);
-                numToLoopDisplay.GetComponent<TextMeshProUGUI>().text = GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().loop[GlobalVariables.GLOBAL_selectedIndex].numToLoop.ToString();
+                if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].action == "for")
+                {
+                    ForLoopPanel.SetActive(true);
+                    numToLoopDisplay.GetComponent<TextMeshProUGUI>().text = GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].numToLoop.ToString();
+                }
+                else
+                {
+                    ForLoopPanel.SetActive(false);
+                }
             }
-            else
+            else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
             {
-                ForLoopPanel.SetActive(false);
+                if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].action == "for")
+                {
+                    ForLoopPanel.SetActive(true);
+                    numToLoopDisplay.GetComponent<TextMeshProUGUI>().text = RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].numToLoop.ToString();
+                }
+                else
+                {
+                    ForLoopPanel.SetActive(false);
+                }
             }
+            
         }
         else
         {
@@ -45,9 +61,19 @@ public class ForLoopPanelController : MonoBehaviour
     {
         if (GlobalVariables.GLOBAL_selectedObject != null)
         {
-            if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().progArray[GlobalVariables.GLOBAL_selectedIndex] != "for")
+            if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
             {
-                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().loop[GlobalVariables.GLOBAL_selectedIndex].numToLoop = 1;
+                if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].action != "for")
+                {
+                    GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].numToLoop = 1;
+                }
+            }
+            else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
+            {
+                if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].action != "for")
+                {
+                    RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].numToLoop = 1;
+                }
             }
         }
     }
@@ -56,23 +82,51 @@ public class ForLoopPanelController : MonoBehaviour
     {
         if  (Input.GetKey(KeyCode.LeftShift))
         {
-            GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().loop[GlobalVariables.GLOBAL_selectedIndex].numToLoop += 5;
+            if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
+            {
+                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].numToLoop += 5;
+            }
+            else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
+            {
+                RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].numToLoop += 5;
+            }
         }
         else
         {
-            GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().loop[GlobalVariables.GLOBAL_selectedIndex].numToLoop++;
+            if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
+            {
+                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].numToLoop++;
+            }
+            else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
+            {
+                RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].numToLoop++;
+            }
         }        
     }
 
     public void DecNumToLoop()
     {
-        if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().loop[GlobalVariables.GLOBAL_selectedIndex].numToLoop > 5 && Input.GetKey(KeyCode.LeftShift))
+        if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
         {
-            GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().loop[GlobalVariables.GLOBAL_selectedIndex].numToLoop -= 5;
+            if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].numToLoop > 5 && Input.GetKey(KeyCode.LeftShift))
+            {
+                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].numToLoop -= 5;
+            }
+            else if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].numToLoop > 1)
+            {
+                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].numToLoop--;
+            }
         }
-        else if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().loop[GlobalVariables.GLOBAL_selectedIndex].numToLoop > 1)
+        else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
         {
-            GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().loop[GlobalVariables.GLOBAL_selectedIndex].numToLoop--;
+            if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].numToLoop > 5 && Input.GetKey(KeyCode.LeftShift))
+            {
+                RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].numToLoop -= 5;
+            }
+            else if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].numToLoop > 1)
+            {
+                RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].numToLoop--;
+            }
         }
     }
 }

@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class blueprint : MonoBehaviour
 {
-
+    [SerializeField] LayerMask canCollidWith;
     [SerializeField] Material blue;
     [SerializeField] Material red;
 
-    [SerializeField] bool freeSpace = true;
+    int numberOfCollisions = 0;
 
     bool isCloseToPlayer = true;
 
@@ -33,7 +33,32 @@ public class blueprint : MonoBehaviour
         moveToMouse();
         createObject();
         cancelPlacement();
+        SetMaterial();
         //TestDistToPlayer();
+    }
+
+    void SetMaterial()
+    {
+        if(numberOfCollisions != 0) //set material red
+        {
+            if (GetComponent<MeshRenderer>() != null)
+                GetComponent<MeshRenderer>().material = red;
+            for (int i = 0; i <= (transform.childCount - 1); i++)
+            {
+                GameObject child = transform.GetChild(i).gameObject;
+                child.GetComponent<MeshRenderer>().sharedMaterial = red;
+            }
+        }
+        else //set material blue
+        {
+            if (GetComponent<MeshRenderer>() != null)
+                GetComponent<MeshRenderer>().material = blue;
+            for (int i = 0; i <= (transform.childCount - 1); i++)
+            {
+                GameObject child = transform.GetChild(i).gameObject;
+                child.GetComponent<MeshRenderer>().sharedMaterial = blue;
+            }
+        }
     }
 
     void moveToMouse()
@@ -51,7 +76,7 @@ public class blueprint : MonoBehaviour
 
     void createObject()
     {
-        if (Input.GetMouseButtonDown(0) && freeSpace && isCloseToPlayer)
+        if (Input.GetMouseButtonDown(0) && numberOfCollisions == 0 && isCloseToPlayer)
         {
             Instantiate(prefabToPlace, transform.position, Quaternion.identity);
             gameGlobalObj.GetComponent<Inventory>().inventory[invIndex] = null;
@@ -61,36 +86,23 @@ public class blueprint : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("trigger")){
-            if(GetComponent<MeshRenderer>() != null)
-                GetComponent<MeshRenderer>().material = red;
-            for(int i = 0; i <= (transform.childCount-1); i++)
-            {
-                GameObject child = transform.GetChild(i).gameObject;
-                child.GetComponent<MeshRenderer>().sharedMaterial = red;
-            }
-            freeSpace = false;
+        if (other.gameObject.layer != canCollidWith){
+            numberOfCollisions++;
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (!other.CompareTag("trigger")){
-            if(GetComponent<MeshRenderer>() != null)
-                GetComponent<MeshRenderer>().material = blue;
-            for(int i = 0; i <= (transform.childCount-1); i++)
-            {
-                GameObject child = transform.GetChild(i).gameObject;
-                child.GetComponent<MeshRenderer>().sharedMaterial = blue;
-            }
-            freeSpace = true;
+        if (other.gameObject.layer != canCollidWith)
+        {
+            numberOfCollisions--;
         }
     }
 
     void TestDistToPlayer()
     {
 
-        if(Vector3.Distance(player.transform.position, transform.position) <= 11 && freeSpace)
+        if(Vector3.Distance(player.transform.position, transform.position) <= 11)
         {
             GetComponent<MeshRenderer>().material = blue;
             isCloseToPlayer = true;
@@ -103,7 +115,7 @@ public class blueprint : MonoBehaviour
     }
 
     void cancelPlacement(){
-        if(Input.GetKeyDown(KeyCode.Tab)){
+        if(Input.GetKeyDown(KeyCode.Tab) || Input.GetMouseButtonDown(2)){
             Destroy(gameObject);
         }
     }

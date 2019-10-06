@@ -25,8 +25,8 @@ public class RobotKeyInput : MonoBehaviour {
         //clears the programming array of the currently selected object
         if (Input.GetKeyDown(KeyCode.Backspace) && GlobalVariables.GLOBAL_selectedObject == GetComponent<LocationInitiation>().objectID)
         {
-            for (int i = 0; i < GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().progArray.Length; i++)
-                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().progArray[i] = "none";
+            for (int i = 0; i < GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram.Length; i++)
+                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[i].action = "none";
             GlobalVariables.GLOBAL_selectedIndex = 0;
         }
     }

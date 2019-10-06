@@ -5,7 +5,7 @@ using UnityEngine;
 public class OnClick : MonoBehaviour
 {
 
-    [SerializeField] GameObject gameGlobalObj;
+    GameObject gameGlobalObj;
 
     private void Start()
     {
@@ -23,7 +23,7 @@ public class OnClick : MonoBehaviour
 
     void ObjType()
     {
-        if (gameObject.CompareTag("robot"))
+        if (gameObject.CompareTag("robot") || gameObject.CompareTag("computer"))
         {
             gameGlobalObj.GetComponent<ui>().EnableProgMenu();
         }

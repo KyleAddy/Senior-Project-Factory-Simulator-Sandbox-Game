@@ -5,11 +5,33 @@ using UnityEngine;
 [System.Serializable]
 public class SaveState
 {
+    [System.Serializable]
+    public struct codeAction
+    {
+        //program action
+        public string action;
+
+        //item selection
+        public string itemSelected;
+
+        //for loop
+        public int numToLoop;
+        public int numLeftToLoop;
+
+        //if statement
+        public string ifCondition;
+        public bool toggleIfConditionOuput;
+        public int ifCountAmount;
+    }
+
     //level data
     public float gameVersion;
     public string worldSize;
     public int worldXLength;
     public int worldZLength;
+
+    //player funcitons
+    public codeAction[,] playerFunctions;
 
     //player position
     public float[] PlayerPosition = new float[2];
@@ -55,28 +77,41 @@ public class SaveState
     }
     public List<storageBoxData> StorageBoxes = new List<storageBoxData>();
 
+    //computers data    
+    public List<float[]> computers = new List<float[]>();
+
     //robot data
     [System.Serializable] public struct robotData
     {
+        [System.Serializable]
+        public struct codeAction
+        {
+            //program action
+            public string action;
+
+            //item selection
+            public string itemSelected;
+
+            //for loop
+            public int numToLoop;
+            public int numLeftToLoop;
+
+            //if statement
+            public string ifCondition;
+            public bool toggleIfConditionOuput;
+            public int ifCountAmount;
+        }
+        
         public string[] robotInventory;
         public float[] robotPosition;
         public int[] robotGridPos;
-        public string[] robotProgram;
-        public string[] itemSelectionArray;
+        public codeAction[] robotProgram;
+        public int[] currentStatement;
 
         public bool inAction;
         public bool isRunning;
         public string action;
         public int currentActionIndex;
-
-        public int[] numToLoop;
-        public int[] numLeftToLoop;
-        public bool[] isActive;
-
-        public int[] currentStatement;
-        public string[] ifCondition;
-        public bool[] toggleIfConditionOutput;
-        public int[] ifCountAmount;
 
         public string turnDir;
         public float totalRot;

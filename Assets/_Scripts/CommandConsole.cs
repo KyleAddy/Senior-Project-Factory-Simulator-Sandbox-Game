@@ -9,6 +9,7 @@ public class CommandConsole : MonoBehaviour
 {
     [SerializeField] ItemSO empty;
     [SerializeField] ItemSO robot;
+    [SerializeField] ItemSO computer;
     [SerializeField] ItemSO refinery;
     [SerializeField] ItemSO assembler;
     [SerializeField] ItemSO ironIngot;
@@ -48,6 +49,17 @@ public class CommandConsole : MonoBehaviour
                 console.SetActive(true);
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            for(int i = 0; i < 2; i++)
+            {
+                for(int p = 0; p < 25; p++)
+                {
+                    print("Function: " + i + " index: " + p + " Action: " + RobotPlayerFunctions.playerFunctions[i, p].action);
+                }
+            }
+        }
     }
 
     public void EnterCommand()
@@ -75,6 +87,45 @@ public class CommandConsole : MonoBehaviour
             
         switch (words[0])
         {
+            /////////////////////////////Help
+            case "help":
+            case "help1":
+                PrintToConsole("Help Page 1/2");
+                PrintToConsole("Clear | \"helpclear\" for more info");
+                PrintToConsole("give  | \"helpgive\"  for more info");
+                PrintToConsole("save  | \"helpsave\"  for more info");
+                PrintToConsole("quit  | \"helpquit\"  for more info");
+                PrintToConsole(" ");
+                //PrintToConsole("\"help2\" for more help");
+                break;
+
+            case "help2":
+                PrintToConsole("Help Page 2/2");
+                PrintToConsole(" ");
+                PrintToConsole(" ");
+                PrintToConsole(" ");
+                PrintToConsole(" ");
+                PrintToConsole(" ");
+                PrintToConsole(" ");
+                break;
+
+            case "helpclear":
+                PrintToConsole("\"clear\" Clears player inventory");
+                break;
+
+            case "helpgive":
+                PrintToConsole("\"give item quantity\" gives player X items");
+                break;
+
+            case "helpsave":
+                PrintToConsole("\"save\" Saves current game");
+                break;
+
+            case "helquit":
+                PrintToConsole("\"quit\" Closes game");
+                break;
+
+            ////////////////////////////////commands
             case "give":
                 GiveCommand(ref words);
                 break;
@@ -116,6 +167,11 @@ public class CommandConsole : MonoBehaviour
             case "robot":
                 gameManager.GetComponent<gameGlobal>().GivePlayerItem(robot, quantity);
                 PrintToConsole("Gave Player robot, quantitiy: " + quantity);
+                break;
+
+            case "computer":
+                gameManager.GetComponent<gameGlobal>().GivePlayerItem(computer, quantity);
+                PrintToConsole("Gave Player computer, quantitiy: " + quantity);
                 break;
 
             case "refinery":

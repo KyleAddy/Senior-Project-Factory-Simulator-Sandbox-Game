@@ -23,11 +23,13 @@ public class SaveLoadGame : MonoBehaviour
     [SerializeField] ItemSO refineryItem;
     [SerializeField] ItemSO assemblerItem;
     [SerializeField] ItemSO storageBoxItem;
+    [SerializeField] ItemSO computer;
 
 
 
     void Update()
     {        
+        /* //for testing
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             print("Saving Game");
@@ -38,6 +40,7 @@ public class SaveLoadGame : MonoBehaviour
             print("Loading Game");
             LoadGame();
         }
+        */
     }
     
     public SaveState CreateSaveObject()
@@ -49,6 +52,32 @@ public class SaveLoadGame : MonoBehaviour
         save.worldSize = GlobalVariables.worldSize;
         save.worldXLength = GlobalVariables.GLOBAL_worldX;
         save.worldZLength = GlobalVariables.GLOBAL_worldZ;
+
+        //player robot functions
+        save.playerFunctions = new SaveState.codeAction[5, 25];
+
+        for(int i = 0; i < 5; i++)
+        {
+            for(int p = 0; p < 25; p++)
+            {
+                SaveState.codeAction action = new SaveState.codeAction();
+                action.action = RobotPlayerFunctions.playerFunctions[i, p].action;
+                action.ifCondition = RobotPlayerFunctions.playerFunctions[i, p].ifCondition;
+                action.ifCountAmount = RobotPlayerFunctions.playerFunctions[i, p].ifCountAmount;
+                if(RobotPlayerFunctions.playerFunctions[i, p].itemSelected == null)
+                {
+                    action.itemSelected = emptyItem.name;
+                }
+                else
+                {
+                    action.itemSelected = RobotPlayerFunctions.playerFunctions[i, p].itemSelected.name;
+                }
+                action.numLeftToLoop = RobotPlayerFunctions.playerFunctions[i, p].numLeftToLoop;
+                action.numToLoop = RobotPlayerFunctions.playerFunctions[i, p].numToLoop;
+                action.toggleIfConditionOuput = RobotPlayerFunctions.playerFunctions[i, p].toggleIfConditionOuput;
+                save.playerFunctions[i, p] = action;
+            }
+        }
 
         //saving player data
         save.PlayerPosition[0] = GameObject.Find("Player").transform.position.x;//x pos
@@ -170,8 +199,18 @@ public class SaveLoadGame : MonoBehaviour
             save.StorageBoxes.Add(boxInfo);
         }
 
-        //save robots
-        var robots = GameObject.FindGameObjectsWithTag("robot");
+        //save computers
+        var computers = GameObject.FindGameObjectsWithTag("computer");
+
+        foreach (var computer in computers)
+        {
+            float[] computerPos = new float[2];
+            computerPos[0] = computer.transform.position.x;
+            computerPos[1] = computer.transform.position.z;
+            save.computers.Add(computerPos);
+        }
+            //save robots
+            var robots = GameObject.FindGameObjectsWithTag("robot");
 
         foreach (var robot in robots)
         {
@@ -195,24 +234,29 @@ public class SaveLoadGame : MonoBehaviour
                     robotInfo.robotInventory[i] = emptyItem.itemName;
                 }
             }
-            robotInfo.robotProgram = new string[robot.GetComponent<robot>().progArray.Length]; //robot program
-            for (int i = 0; i < robot.GetComponent<robot>().progArray.Length; i++)
+            robotInfo.robotProgram = new SaveState.robotData.codeAction[robot.GetComponent<robot>().robotProgram.Length]; //robot program
+            for (int i = 0; i < robot.GetComponent<robot>().robotProgram.Length; i++)
             {
-                robotInfo.robotProgram[i] = robot.GetComponent<robot>().progArray[i];
-            }
-            robotInfo.itemSelectionArray = new string[robot.GetComponent<robot>().itemSelectionArray.Length]; //robot itemSelectionArray
-            for (int i = 0; i < robot.GetComponent<robot>().itemSelectionArray.Length; i++)
-            {
-                if (robot.GetComponent<robot>().itemSelectionArray[i] != null)
+                //robot actions
+                robotInfo.robotProgram[i].action = robot.GetComponent<robot>().robotProgram[i].action;
+                //robot itemSelection
+                if(robot.GetComponent<robot>().robotProgram[i].itemSelected == null)
                 {
-                    robotInfo.itemSelectionArray[i] = robot.GetComponent<robot>().itemSelectionArray[i].itemName;
+                    robotInfo.robotProgram[i].itemSelected = emptyItem.itemName;
                 }
                 else
                 {
-                    robotInfo.itemSelectionArray[i] = emptyItem.itemName;
+                    robotInfo.robotProgram[i].itemSelected = robot.GetComponent<robot>().robotProgram[i].itemSelected.itemName;
                 }
-                
+                //robot for loop
+                robotInfo.robotProgram[i].numToLoop = robot.GetComponent<robot>().robotProgram[i].numToLoop;
+                robotInfo.robotProgram[i].numLeftToLoop = robot.GetComponent<robot>().robotProgram[i].numLeftToLoop;
+                //robot if statement
+                robotInfo.robotProgram[i].ifCondition = robot.GetComponent<robot>().robotProgram[i].ifCondition;
+                robotInfo.robotProgram[i].toggleIfConditionOuput = robot.GetComponent<robot>().robotProgram[i].toggleIfConditionOuput;
+                robotInfo.robotProgram[i].ifCountAmount = robot.GetComponent<robot>().robotProgram[i].ifCountAmount;
             }
+
             robotInfo.action = robot.GetComponent<robot>().action;//save action
             robotInfo.currentActionIndex = robot.GetComponent<robot>().currentActionIndex;//save current action index
             robotInfo.turnDir = robot.GetComponent<robot>().turnDir; //save turning direction
@@ -222,31 +266,14 @@ public class SaveLoadGame : MonoBehaviour
 
             robotInfo.inAction = robot.GetComponent<robot>().inAction; //save if robot is in a action
             robotInfo.isRunning = robot.GetComponent<robot>().isRunning; //save if robot is running program
-            robotInfo.numToLoop = new int[robot.GetComponent<robot>().loop.Length];
-            robotInfo.numLeftToLoop = new int[robot.GetComponent<robot>().loop.Length];
-            robotInfo.isActive = new bool[robot.GetComponent<robot>().loop.Length];
-            for (int i = 0; i < robot.GetComponent<robot>().loop.Length; i++) //save the loop data
-            {
-                robotInfo.isActive[i] = robot.GetComponent<robot>().loop[i].isActive;
-                robotInfo.numLeftToLoop[i] = robot.GetComponent<robot>().loop[i].numLeftToLoop;
-                robotInfo.numToLoop[i] = robot.GetComponent<robot>().loop[i].numToLoop;
-            }
+
             robotInfo.currentStatement = robot.GetComponent<robot>().currentStatement.ToArray(); // create a copy of the current statement stack
-            robotInfo.ifCondition = new string[robot.GetComponent<robot>().ifCondition.Length]; //create ifCondition array
-            robotInfo.toggleIfConditionOutput = new bool[25]; //create toggleIfConditionOutput array
-            robotInfo.ifCountAmount = new int[25]; //create ifCountAmount array
-            for (int i = 0; i < 25; i++) //save the ifCondition data
-            {
-                robotInfo.ifCondition[i] = robot.GetComponent<robot>().ifCondition[i];//save if conditions
-                robotInfo.toggleIfConditionOutput[i] = robot.GetComponent<robot>().toggleIfConditionOutput[i]; //save toggle if condition
-                robotInfo.ifCountAmount[i] = robot.GetComponent<robot>().ifCountAmount[i];//save if count amount 
-            }            
+          
             robotInfo.targPos = new int[2];//create targPos array
             robotInfo.targPos[0] = (int)robot.GetComponent<robot>().targPos.x;//x Pos
             robotInfo.targPos[1] = (int)robot.GetComponent<robot>().targPos.z;// z Pos
             robotInfo.movingForward = robot.GetComponent<robot>().movingForward;
             robotInfo.progBar = robot.GetComponent<robot>().progBar.fillAmount;
-
             save.robots.Add(robotInfo);
         }
         return save;
@@ -274,6 +301,23 @@ public class SaveLoadGame : MonoBehaviour
             FileStream file = File.Open(Application.persistentDataPath + GlobalVariables.levelPath, FileMode.Open);
             SaveState save = (SaveState)bf.Deserialize(file);
             file.Close();
+
+        //Load player functions
+        for(int i = 0; i < 5; i++)
+        {
+            for(int p = 0; p < 25; p++)
+            {
+                RobotPlayerFunctions.codeAction action = new RobotPlayerFunctions.codeAction();
+                action.action = save.playerFunctions[i, p].action;
+                action.ifCondition = save.playerFunctions[i, p].ifCondition;
+                action.ifCountAmount = save.playerFunctions[i, p].ifCountAmount;
+                action.itemSelected = nameFromItem(save.playerFunctions[i, p].itemSelected);
+                action.numLeftToLoop = save.playerFunctions[i, p].numLeftToLoop;
+                action.numToLoop = save.playerFunctions[i, p].numToLoop;
+                action.toggleIfConditionOuput = save.playerFunctions[i, p].toggleIfConditionOuput;
+                RobotPlayerFunctions.playerFunctions[i, p] = action;
+            }
+        }
 
             //GlobalVariables.GLOBAL_grid = new GameObject[save.worldXLength, save.worldZLength];//create level grid
             GlobalVariables.GLOBAL_worldX = save.worldXLength;
@@ -339,7 +383,14 @@ public class SaveLoadGame : MonoBehaviour
                     GlobalVariables.GLOBAL_grid[box.storageBoxPosition[0], box.storageBoxPosition[1]].GetComponent<Inventory>().inventory[i] = nameFromItem(box.storageBoxInventory[i]);
                 }
             }
-            
+
+            //load computers
+            int count = 0;
+            while(count < save.computers.Count)
+            {
+                GameObject newComputer = Instantiate(computer.itemPrefab, new Vector3(save.computers[count][0], 0, save.computers[count][1]), Quaternion.identity);
+                count++;
+            }
             
             //load all the robots
             foreach (SaveState.robotData robot in save.robots)
@@ -363,12 +414,15 @@ public class SaveLoadGame : MonoBehaviour
                 }
                 for (int i = 0; i < robot.robotProgram.Length; i++) //load the robots programming array
                 {
-                    newRobot.GetComponent<robot>().progArray[i] = robot.robotProgram[i];
+                    newRobot.GetComponent<robot>().robotProgram[i].action = robot.robotProgram[i].action;
+                    newRobot.GetComponent<robot>().robotProgram[i].ifCondition = robot.robotProgram[i].ifCondition;
+                    newRobot.GetComponent<robot>().robotProgram[i].ifCountAmount = robot.robotProgram[i].ifCountAmount;
+                    newRobot.GetComponent<robot>().robotProgram[i].itemSelected = nameFromItem(robot.robotProgram[i].itemSelected);
+                    newRobot.GetComponent<robot>().robotProgram[i].numLeftToLoop = robot.robotProgram[i].numLeftToLoop;
+                    newRobot.GetComponent<robot>().robotProgram[i].numToLoop = robot.robotProgram[i].numToLoop;
+                    newRobot.GetComponent<robot>().robotProgram[i].toggleIfConditionOuput = robot.robotProgram[i].toggleIfConditionOuput;
                 }
-                for (int i = 0; i < robot.robotInventory.Length; i++)//set robot itemSelectionArray
-                {
-                    newRobot.GetComponent<robot>().itemSelectionArray[i] = nameFromItem(robot.itemSelectionArray[i]);
-                }
+                
                 newRobot.GetComponent<robot>().action = robot.action; //load action
                 newRobot.GetComponent<robot>().currentActionIndex = robot.currentActionIndex;//load current action index
                 newRobot.GetComponent<robot>().turnDir = robot.turnDir; //loading turn direction
@@ -378,23 +432,11 @@ public class SaveLoadGame : MonoBehaviour
 
                 newRobot.GetComponent<robot>().inAction = robot.inAction; //load if robot is in an action
                 newRobot.GetComponent<robot>().isRunning = robot.isRunning; //load if thr robot is running the program                
-                for (int i = 0; i < robot.isActive.Length; i++) //load the loop data
-                {
-                    newRobot.GetComponent<robot>().loop[i].isActive = robot.isActive[i];
-                    newRobot.GetComponent<robot>().loop[i].numLeftToLoop = robot.numLeftToLoop[i];
-                    newRobot.GetComponent<robot>().loop[i].numToLoop = robot.numToLoop[i];
-                }
+               
                 for(int i = 0; i < robot.currentStatement.Length; i++) //load the currentStatement data
                 {
                     newRobot.GetComponent<robot>().currentStatement.Push(robot.currentStatement[i]);
-                }
-                for(int i = 0; i < 25; i++) 
-                {
-                    newRobot.GetComponent<robot>().ifCondition[i] = robot.ifCondition[i];//load the ifCondition data
-                    newRobot.GetComponent<robot>().toggleIfConditionOutput[i] = robot.toggleIfConditionOutput[i];//load the toggleIfConditionOutput data
-                    newRobot.GetComponent<robot>().ifCountAmount[i] = robot.ifCountAmount[i];//load the if count amount data
-                }
-
+                }                
                 newRobot.GetComponent<robot>().targPos = new Vector3((int)robot.targPos[0], .5f, (int)robot.targPos[1]); //load targPos
                 newRobot.GetComponent<robot>().movingForward = robot.movingForward;
                 newRobot.GetComponent<robot>().progBar.fillAmount = robot.progBar;                  

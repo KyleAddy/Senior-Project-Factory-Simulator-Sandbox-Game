@@ -21,12 +21,31 @@ public class ItemSelectionPanelController : MonoBehaviour
 
     void ItemSelectionPanelCheck(){
         if(GlobalVariables.GLOBAL_selectedObject != null){
-            if(GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().progArray[GlobalVariables.GLOBAL_selectedIndex] == "withdraw" || GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().progArray[GlobalVariables.GLOBAL_selectedIndex] == "deposit"){
-                ItemSelectionPanel.SetActive(true);
-            } else
+            if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
             {
-              ItemSelectionPanel.SetActive(false);   
+                if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].action == "withdraw"
+                || GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].action == "deposit")
+                {
+                    ItemSelectionPanel.SetActive(true);
+                }
+                else
+                {
+                    ItemSelectionPanel.SetActive(false);
+                }
             }
+            else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
+            {
+                if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].action == "withdraw"
+                || RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].action == "deposit")
+                {
+                    ItemSelectionPanel.SetActive(true);
+                }
+                else
+                {
+                    ItemSelectionPanel.SetActive(false);
+                }
+            }
+            
         } else{
              ItemSelectionPanel.SetActive(false);
         }
@@ -34,8 +53,19 @@ public class ItemSelectionPanelController : MonoBehaviour
 
     void SetItemSelectedToNull(){
         if(GlobalVariables.GLOBAL_selectedObject != null){
-            if(GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().progArray[GlobalVariables.GLOBAL_selectedIndex] != "withdraw" && GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().progArray[GlobalVariables.GLOBAL_selectedIndex] != "deposit"){
-                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().itemSelectionArray[GlobalVariables.GLOBAL_selectedIndex] = null;
+            if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
+            {
+                if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].action != "withdraw" && GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].action != "deposit")
+                {
+                    GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].itemSelected = null;
+                }
+            }
+            else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
+            {
+                if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].action != "withdraw" && RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].action != "deposit")
+                {
+                    RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction,  GlobalVariables.GLOBAL_selectedIndex].itemSelected = null;
+                }
             }
         }
     }

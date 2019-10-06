@@ -20,15 +20,40 @@ public class ItemSelectionButton : MonoBehaviour
 
     public void SetSelectedItem(){
         if(GlobalVariables.GLOBAL_selectedObject != null){
-            if(GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().progArray[GlobalVariables.GLOBAL_selectedIndex] == "withdraw" || GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().progArray[GlobalVariables.GLOBAL_selectedIndex] == "deposit"){
-                GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().itemSelectionArray[GlobalVariables.GLOBAL_selectedIndex] = buttonItem;
-                GlobalVariables.GLOBAL_selectedIndex++;
+
+            if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
+            {
+                if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].action == "withdraw" || GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].action == "deposit")
+                {
+                    GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].itemSelected = buttonItem;
+                    GlobalVariables.GLOBAL_selectedIndex++;
+                }
+            }     
+            else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
+            {
+                if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].action == "withdraw" || RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].action == "deposit")
+                {
+                    RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].itemSelected = buttonItem;
+                    GlobalVariables.GLOBAL_selectedIndex++;
+                }
             }
         }
     }
 
     void selectButton(){
-        if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().itemSelectionArray[GlobalVariables.GLOBAL_selectedIndex] == buttonItem)
-            button.Select(); 
+        if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
+        {
+            if (GlobalVariables.GLOBAL_selectedObject.GetComponent<robot>().robotProgram[GlobalVariables.GLOBAL_selectedIndex].itemSelected == buttonItem)
+            {
+                button.Select();
+            }
+        }
+        else if (GlobalVariables.GLOBAL_selectedObject.CompareTag("computer"))
+        {
+            if (RobotPlayerFunctions.playerFunctions[RobotPlayerFunctions.selectedFunction, GlobalVariables.GLOBAL_selectedIndex].itemSelected == buttonItem)
+            {
+                button.Select();
+            }
+        }
     }
 }

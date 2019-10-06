@@ -54,9 +54,12 @@ public class CommandWindow : MonoBehaviour
 
                     break;
                 case "program":
-                    invButton.SetActive(true);
-                    runRobotCodeButton.SetActive(true);
-                    CopyPasteButton.SetActive(true);
+                    if (GlobalVariables.GLOBAL_selectedObject.CompareTag("robot"))
+                    {
+                        invButton.SetActive(true);
+                        runRobotCodeButton.SetActive(true);
+                        CopyPasteButton.SetActive(true);
+                    }
                     break;
 
                 case "refinery":

@@ -5,7 +5,12 @@ using UnityEngine.UI;
 
 public class robot : MonoBehaviour {
 
-    [SerializeField] GameObject globalGameObj;
+    [SerializeField] GameObject LeftTrack;
+    [SerializeField] GameObject RightTrack;
+    [SerializeField] GameObject Claw;
+    [SerializeField] GameObject Drill;
+
+    GameObject globalGameObj;
 	public string action = "none";
 	public Vector3 targPos = new Vector3(.5f,0,0);
     public Vector3 gridCoords;
@@ -23,45 +28,46 @@ public class robot : MonoBehaviour {
     public bool forwardTrigger;
     public bool backwardTrigger;
 
-	public string[] progArray = new string[25];
-    public ItemSO[] itemSelectionArray = new ItemSO[25];
 	[SerializeField] public int progLength;
 	public int currentActionIndex = 0;
 
 	public float progressSpeed = .1f;
 
-    /////////////////for loop code
-
-    public struct forLoop
-    {
-        public int numToLoop;
-        public int numLeftToLoop;
-        public bool isActive;
-    }
-
-    //keeps the info for each for loop
-    //could make this 23 since you cant have a for loop at the end where it does something and is balanced
-    [SerializeField]
-    public forLoop[] loop = new forLoop[25];
-
     [SerializeField]
     public Stack<int> currentStatement = new Stack<int>();
 
+    //////////////////////////compiled code
+    [System.Serializable]
+    public struct codeAction
+    {
+        //program action
+        public string action;
+
+        //item selection
+        public ItemSO itemSelected;
+
+        //for loop
+        public int numToLoop;
+        public int numLeftToLoop;
+
+        //if statement
+        public string ifCondition;
+        public bool toggleIfConditionOuput;
+        public int ifCountAmount;
+    }
 
     [SerializeField]
-    public string[] ifCondition = new string[25];
+    List<RobotPlayerFunctions.codeAction> compiledProgram = new List<RobotPlayerFunctions.codeAction>();
 
-    public bool[] toggleIfConditionOutput = new bool[25];
+    [SerializeField]
+    public RobotPlayerFunctions.codeAction[] robotProgram = new RobotPlayerFunctions.codeAction[25];
 
-    public int[] ifCountAmount = new int[25];
-
-   
-
-    //////////////////////////
+    ////////////////////////////////////////
 
 
 	void Start () {
         globalGameObj = GlobalVariables.gameManager;
+        CompileProgram();
 
         if (gridCoords.x == .5f)
         {
@@ -69,11 +75,11 @@ public class robot : MonoBehaviour {
         }
 
         
-		for (int i = 0; i < progArray.GetLength(0); i++)
+		for (int i = 0; i < robotProgram.GetLength(0); i++)
         {
-            if (progArray[i] == "")
+            if (robotProgram[i].action == "")
             {
-                progArray[i] = "none";
+                robotProgram[i].action = "none";
             }
         }			
         if(action == "")
@@ -86,7 +92,7 @@ public class robot : MonoBehaviour {
         {
             for (int i = 0; i < 25; i++)
             {
-                ifCountAmount[i] = 0;
+                robotProgram[i].ifCountAmount = 0;
             }
         }
 		moveSpeed = 1f;
@@ -97,8 +103,10 @@ public class robot : MonoBehaviour {
 	void Update () {
 
 		if (GlobalVariables.GLOBAL_selectedObject == GetComponent<LocationInitiation>().objectID && GlobalVariables.GLOBAL_selectedIndex >= progLength) //sets the selected Index to 0 once it reaches the end of the available programming blocks
-			GlobalVariables.GLOBAL_selectedIndex = 0;
-       
+        {
+            GlobalVariables.GLOBAL_selectedIndex = 0;
+        }
+
         setAction();
 
         performingAction();
@@ -106,9 +114,10 @@ public class robot : MonoBehaviour {
 
     void setAction()
     {
+        GameObject temp = null;
         //setting the action
         if (!inAction && isRunning)
-            switch (progArray[currentActionIndex])
+            switch (compiledProgram[currentActionIndex].action)//progArray[currentActionIndex]
             {
 
                 case "forward":
@@ -141,21 +150,45 @@ public class robot : MonoBehaviour {
                     break;
 
                 case "deposit":
-                    inAction = true;
-                    action = "deposit";
-                    setProgBar(1f);
+                    temp = findInventory();
+                    if(temp != null)
+                    {
+                        if (temp.GetComponent<Inventory>())
+                        {
+                            inAction = true;
+                            action = "deposit";
+                            setProgBar(1f);
+                            Claw.GetComponent<Animator>().SetTrigger("Activate");
+                        }
+                    }                    
                     break;
 
                 case "withdraw":
-                    inAction = true;
-                    action = "withdraw";
-                    setProgBar(1f);
+                    temp = findInventory();
+                    if (temp != null)
+                    {
+                        if (temp.GetComponent<Inventory>())
+                        {
+                            inAction = true;
+                            action = "withdraw";
+                            setProgBar(1f);
+                            Claw.GetComponent<Animator>().SetTrigger("Activate");
+                        }
+                    }
                     break;
 
                 case "mine":
-                    inAction = true;
-                    action = "mine";
-                    setProgBar(1f);
+                    temp = findOreMine();
+                    if (temp != null)
+                    {
+                        if (temp.CompareTag("oreMine"))
+                        {
+                            inAction = true;
+                            action = "mine";
+                            setProgBar(1f);
+                            Drill.GetComponent<Animator>().SetTrigger("Activate");
+                        }
+                    }
                     break;
 
                 case "for":
@@ -163,14 +196,16 @@ public class robot : MonoBehaviour {
                     break;
 
                 case "if":
-                    IfConditions(ifCondition[currentActionIndex]);
+                    IfConditions(compiledProgram[currentActionIndex].ifCondition); //IfConditions(ifCondition[currentActionIndex]);
                     break;
 
                 case "closeBrace":
                     EndBrace();
                     break;
 
-
+                default:
+                    nextAction();
+                    break;
             }
     }
 
@@ -187,20 +222,29 @@ public class robot : MonoBehaviour {
                     if (targPos == transform.position)
                     {
                         gridCoords = new Vector3(transform.position.x, 0, transform.position.z);
+                        LeftTrack.GetComponent<Animator>().SetInteger("Direction", 0);
+                        RightTrack.GetComponent<Animator>().SetInteger("Direction", 0);
                         nextAction();
                     }
                     else
                     {
                         if (movingForward)
                         {
-                            if(!forwardTrigger)
+                            if (!forwardTrigger)
+                            {
+                                LeftTrack.GetComponent<Animator>().SetInteger("Direction", 1);
+                                RightTrack.GetComponent<Animator>().SetInteger("Direction", 1);
                                 transform.position = Vector3.MoveTowards(transform.position, targPos, moveSpeed * Time.deltaTime);
+                            }
                         }
                         else {
                             if (!backwardTrigger)
+                            {
+                                LeftTrack.GetComponent<Animator>().SetInteger("Direction", -1);
+                                RightTrack.GetComponent<Animator>().SetInteger("Direction", -1);
                                 transform.position = Vector3.MoveTowards(transform.position, targPos, moveSpeed * Time.deltaTime);
-                        }
-                        
+                            }
+                        }                        
                     }
                     break;
 
@@ -209,12 +253,16 @@ public class robot : MonoBehaviour {
                     { //rotate the robot a few degrees at a timeuntil totalRot is at least 90
                         if (turnDir == "left")
                         {
+                            LeftTrack.GetComponent<Animator>().SetInteger("Direction", -1);
+                            RightTrack.GetComponent<Animator>().SetInteger("Direction", 1);
                             float currentAngle = transform.rotation.eulerAngles.y;
                             transform.rotation = Quaternion.AngleAxis(currentAngle - (Time.deltaTime * degreesPerSecond), Vector3.up);
                             totalRot += Time.deltaTime * degreesPerSecond;
                         }
                         else if (turnDir == "right")
                         {
+                            LeftTrack.GetComponent<Animator>().SetInteger("Direction", 1);
+                            RightTrack.GetComponent<Animator>().SetInteger("Direction", -1);
                             float currentAngle = transform.rotation.eulerAngles.y;
                             transform.rotation = Quaternion.AngleAxis(currentAngle + (Time.deltaTime * degreesPerSecond), Vector3.up);
                             totalRot += Time.deltaTime * degreesPerSecond;
@@ -234,6 +282,8 @@ public class robot : MonoBehaviour {
                         totalRot = 0;
                         nextAction();
                         turnDir = "none";
+                        LeftTrack.GetComponent<Animator>().SetInteger("Direction", 0);
+                        RightTrack.GetComponent<Animator>().SetInteger("Direction", 0);
                     }
                     break;
 
@@ -278,7 +328,7 @@ public class robot : MonoBehaviour {
 		action = "none";
 		inAction = false;
 		currentActionIndex++;
-		if (currentActionIndex >= progLength) {
+		if (currentActionIndex >= compiledProgram.Count) {
 			currentActionIndex = 0;
 			isRunning = false;
 		}
@@ -292,34 +342,38 @@ public class robot : MonoBehaviour {
             return;
         }
         
-        if (progArray[currentStatement.Peek()] == "for")
+        if (compiledProgram[currentStatement.Peek()].action == "for")//(progArray[currentStatement.Peek()] == "for")
         {
-            if (loop[currentStatement.Peek()].numLeftToLoop <= 0)//check to see if the for loop has looped the needed amount of times
+            if (compiledProgram[currentStatement.Peek()].numLeftToLoop <= 0)//(loop[currentStatement.Peek()].numLeftToLoop <= 0)//check to see if the for loop has looped the needed amount of times
             {
                 currentStatement.Pop();//remove it from the stack
                 nextAction();
                 return;
             }
-            loop[currentStatement.Peek()].numLeftToLoop--;//decrement the number of times needed to loop by 1
+            //loop[currentStatement.Peek()].numLeftToLoop--;//decrement the number of times needed to loop by 1
+            RobotPlayerFunctions.codeAction changedAction = compiledProgram[currentStatement.Peek()];
+            changedAction.numLeftToLoop--;
+            compiledProgram[currentStatement.Peek()] = changedAction;
             currentActionIndex = (currentStatement.Peek() + 1);//change the currentActionIndex to the start of the loop 
             return;
         } 
 
-        if (progArray[currentStatement.Peek()] == "if")
+        if (compiledProgram[currentStatement.Peek()].action == "if")//(progArray[currentStatement.Peek()] == "if")
         {
             nextAction();
         }
-
-
-
     }
 
     void AddStatement()
     {
         currentStatement.Push(currentActionIndex);//push the current loop to the stack
-        if (progArray[currentActionIndex] == "for")
+        if (compiledProgram[currentActionIndex].action == "for")//progArray[currentActionIndex]
         {
-            loop[currentActionIndex].numLeftToLoop = (loop[currentActionIndex].numToLoop - 1); //set the needed times to loop
+            //loop[currentActionIndex].numLeftToLoop = (loop[currentActionIndex].numToLoop - 1); //set the needed times to loop
+            //creat a copy of the action, changed the action, then set the old action to the new action
+            RobotPlayerFunctions.codeAction changedAction = compiledProgram[currentActionIndex];
+            changedAction.numLeftToLoop = (compiledProgram[currentActionIndex].numToLoop - 1);
+            compiledProgram[currentActionIndex] = changedAction;
         }
         nextAction();
     }
@@ -356,19 +410,19 @@ public class robot : MonoBehaviour {
                 break;
 
             case "RobotXEmptySlots":
-                conditionPassed = GlobalFunctions.CheckItemSoArrayForXEmptySlots(GetComponent<Inventory>().inventory, GetComponent<Inventory>().invSize, ifCountAmount[currentActionIndex]);
+                conditionPassed = GlobalFunctions.CheckItemSoArrayForXEmptySlots(GetComponent<Inventory>().inventory, GetComponent<Inventory>().invSize, robotProgram[currentActionIndex].ifCountAmount);
                 break;
 
             case "AdjacentInvXEmptySlots":
                 adjacentInv = findInventory();
                 if (adjacentInv != null)
                 {
-                    conditionPassed = GlobalFunctions.CheckItemSoArrayForXEmptySlots(adjacentInv.GetComponent<Inventory>().inventory, adjacentInv.GetComponent<Inventory>().invSize, ifCountAmount[currentActionIndex]);
+                    conditionPassed = GlobalFunctions.CheckItemSoArrayForXEmptySlots(adjacentInv.GetComponent<Inventory>().inventory, adjacentInv.GetComponent<Inventory>().invSize, robotProgram[currentActionIndex].ifCountAmount);
                 }
                 break;
         }
 
-        if (toggleIfConditionOutput[currentActionIndex])
+        if (robotProgram[currentActionIndex].toggleIfConditionOuput)
         {
             conditionPassed = !conditionPassed;
         }
@@ -381,7 +435,7 @@ public class robot : MonoBehaviour {
         {
             for(int i = currentActionIndex; i < progLength; i++)
             {
-                if(progArray[i] == "closeBrace")
+                if (compiledProgram[i].action == "closeBrace")//(progArray[i] == "closeBrace")
                 {
                     currentActionIndex = i;
                     nextAction();
@@ -551,10 +605,10 @@ public class robot : MonoBehaviour {
         if (selectedInv != null) {            
 			for (int i = 0; i < GetComponent<Inventory>().invSize; i++) {//iterate through the robots inventory            
                 if (GetComponent<Inventory>().inventory[i] != null) {//if the inventory slot is not empty
-                    if (itemSelectionArray[currentActionIndex] == null || itemSelectionArray[currentActionIndex].itemName == "") {//if there is no selected item then set foundItemIndex
+                    if (robotProgram[currentActionIndex].itemSelected == null || robotProgram[currentActionIndex].itemSelected.itemName == "") {//if there is no selected item then set foundItemIndex
                         foundItemIndex = i;
                     }
-                    else if (itemSelectionArray[currentActionIndex] == GetComponent<Inventory>().inventory[i]){//if the itemselected is the same as the item found then set foundItemIndex
+                    else if (robotProgram[currentActionIndex].itemSelected == GetComponent<Inventory>().inventory[i]){//if the itemselected is the same as the item found then set foundItemIndex
                         foundItemIndex = i;
                     }
                 }
@@ -590,15 +644,15 @@ public class robot : MonoBehaviour {
                 if (selectedInv.GetComponent<Inventory>().inventory[p] != null)
                 {//if the inventory slot is not empty
 
-                    if (itemSelectionArray[currentActionIndex] == null)
+                    if (robotProgram[currentActionIndex].itemSelected == null)
                     {//if there is no selected item then set foundItemIndex
                         foundItemIndex = p;
                     }
-                    else if (itemSelectionArray[currentActionIndex].itemName == "")//if the item is empty then set foundItemIndex
+                    else if (robotProgram[currentActionIndex].itemSelected.itemName == "")//if the item is empty then set foundItemIndex
                     {
                         foundItemIndex = p;
                     }
-                    else if (itemSelectionArray[currentActionIndex] == selectedInv.GetComponent<Inventory>().inventory[p])
+                    else if (robotProgram[currentActionIndex].itemSelected == selectedInv.GetComponent<Inventory>().inventory[p])
                     {//if the itemselected is the same as the item found then set foundItemIndex
                         foundItemIndex = p;
                     }
@@ -641,13 +695,13 @@ public class robot : MonoBehaviour {
      bool CheckProgramBalance()
     {
         int counter = 0;
-        for(int i = 0; i < GetComponent<robot>().progArray.Length; i++)
+        for(int i = 0; i < GetComponent<robot>().robotProgram.Length; i++)
         {
-            if (GetComponent<robot>().progArray[i] == "for" || GetComponent<robot>().progArray[i] == "if")
+            if (GetComponent<robot>().robotProgram[i].action == "for" || GetComponent<robot>().robotProgram[i].action == "if")
             {
                 counter++;
             }
-            if (GetComponent<robot>().progArray[i] == "closeBrace")
+            if (GetComponent<robot>().robotProgram[i].action == "closeBrace")
             {
                 counter--;
             }
@@ -661,6 +715,7 @@ public class robot : MonoBehaviour {
 
     public void runCode()
     {
+        CompileProgram();
         if (CheckProgramBalance())
         {
             isRunning = true;
@@ -671,4 +726,54 @@ public class robot : MonoBehaviour {
         }
     }
 
-}		
+    void CompileProgram()
+    {
+        compiledProgram.Clear();
+        //iterate through the robots program and compile it into the ComipledProgram List
+        for(int i = 0; i < progLength; i++)
+        {
+            if(robotProgram[i].action == null || robotProgram[i].action == "none")
+            {
+                continue;
+            }
+            if (robotProgram[i].action == "function1")
+            {
+                for(int f = 0; f < RobotPlayerFunctions.playerFunctions.GetLength(1); f++)
+                {
+                    if (robotProgram[i].action == null || robotProgram[i].action == "none")
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        AddActionToCompiledProgram(RobotPlayerFunctions.playerFunctions[0,f]);
+                    }
+                }
+            }
+            else
+            {
+                AddActionToCompiledProgram(robotProgram[i]);
+            }
+            
+        }
+    }
+
+    private void AddActionToCompiledProgram(RobotPlayerFunctions.codeAction action)
+    {
+        RobotPlayerFunctions.codeAction newAction = new RobotPlayerFunctions.codeAction(); //initiate a new codeAction to add to the program
+
+        //program action
+        newAction.action = action.action;
+        //item selection            
+        newAction.itemSelected = action.itemSelected;
+        //for loop
+        newAction.numToLoop = action.numToLoop;
+        newAction.numLeftToLoop = action.numLeftToLoop;
+        //if statement
+        newAction.ifCondition = action.ifCondition;
+        newAction.toggleIfConditionOuput = action.toggleIfConditionOuput;
+        newAction.ifCountAmount = action.ifCountAmount;
+
+        compiledProgram.Add(newAction);
+    }
+}
